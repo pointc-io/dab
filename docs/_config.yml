@@ -17,7 +17,7 @@ title: Browser Fingerprinting
 email: dev@pointc.io
 description: >- # this means to ignore newlines until "baseurl:"
   It's the other point between A and B
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "dab" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: pointc-io
 github_username:  cmolocznik
