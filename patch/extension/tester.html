@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript">
+    function reloadFrame() {
+      var element = document.getElementById('sandboxed');
+      element.removeAttribute('sandbox');
+//      element.setAttribute('sandbox', 'allow-scripts');
+
+      var sibling = element.nextElementSibling;
+      var parent = element.parentNode;
+
+      parent.removeChild(element);
+
+      var newElement = document.createElement('iframe');
+      newElement.setAttribute('src', 'about:blank');
+
+      if (sibling) {
+        parent.insertBefore(newElement, sibling);
+      } else {
+        parent.appendChild(newElement);
+      }
+
+//      element.setAttribute('sandbox', 'allow-same-origin');
+
+//      parent.removeChild(element);
+//      if (sibling) {
+//        parent.insertBefore(element, sibling);
+//      } else {
+//        parent.appendChild(element);
+//      }
+    }
+  </script>
+</head>
+<body>
+<script type="text/javascript">
+  document.write(navigator.appCodeName);
+</script>
+<button type="button" onclick="reloadFrame()">Reload</button>
+
+
+<iframe id="sandboxed200" sandbox="allow-same-origin" style="display:none"></iframe>
+
+<div>
+  <iframe id="sandboxed2001" sandbox="allow-same-origin" style="display:none"></iframe>
+
+  <div>
+    <iframe id="s" sandbox="allow-same-origin" style="display:none"></iframe>
+  </div>
+</div>
+
+<script type="text/javascript">
+  document.write(navigator.appCodeName);
+  document.write('<iframe id="sandboxed200" sandbox="allow-same-origin" style="display:none" src="about:blank"></iframe>');
+</script>
+
+<script type="text/javascript">
+//  this[0].frameElement.setAttribute('sandbox', '');
+//  this[0].document.write('_');
+//  this[0].document.clear();
+//  this[0].frameElement.setAttribute('sandbox', 'allow-same-origin');
+  console.log('After - IFrame Loaded');
+  document.write(this[0].navigator.appCodeName);
+  document.write(this[1].navigator.appCodeName);
+</script>
+<!--&lt;!&ndash;<iframe id="sandboxed100" style="display:none"></iframe>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<iframe id="sandboxed" sandbox="" style="display:none"></iframe>&ndash;&gt;-->
+
+<!--<script type="text/javascript">-->
+  <!--document.write('<iframe id="sandboxed200" sandbox="allow-same-origin" style="display:none" src="about:blank"></iframe>');-->
+<!--//  this[1].frameElement.setAttribute('sandbox', '');-->
+<!--//  this[1].document.write('_');-->
+<!--//  this[1].document.clear();-->
+<!--//  this[1].frameElement.setAttribute('sandbox', 'allow-same-origin');-->
+<!--//  document.write('<iframe id="sandboxed200" style="display:none" src="about:blank"></iframe>');-->
+  <!--console.log('Sandbox Loaded!');-->
+
+<!--//  try {-->
+<!--//    Object.defineProperty(Window.prototype, 'navigator', { get: () => nav, enumerable: true, configurable: false })-->
+<!--//  } catch (e) {-->
+<!--//    console.log(e);-->
+<!--//  }-->
+<!--//  this[1].frameElement.setAttribute('sandbox', '');-->
+<!--//  this[1].document.write('_');-->
+<!--//  this[1].document.clear();-->
+<!--//  this[1].frameElement.setAttribute('sandbox', 'allow-same-origin');-->
+
+  <!--document.write(this[1].navigator.appCodeName);-->
+<!--</script>-->
+<!--<iframe id="p" sandbox="allow-same-origin" style="width:500px; height: 500px;" src="child.html"></iframe>-->
+<!--<iframe id="p" style="width:500px; height: 500px;" src="child.html"></iframe>-->
+<!--<iframe id="sandboxed2" sandbox="" style="display:none"></iframe>-->
+<!--<iframe id="sandboxed10" sandbox="allow-top-navigation" style="display:none"></iframe>-->
+<!--<iframe id="sandboxed3" sandbox="allow-scripts" src="https://untraceable.me"></iframe>-->
+<!--<iframe id="sandboxed30" src="https://browserleaks.com/javascript" width="800" height="700"></iframe>-->
+</body>
+</html>

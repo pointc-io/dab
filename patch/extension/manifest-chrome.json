@@ -1,0 +1,66 @@
+{
+  "manifest_version": 2,
+  "name": "Untraceable",
+  "version": "0.1",
+
+  "browser_action": {
+    "browser_style": true,
+    "default_icon": {
+      "48": "images/icons/48x48.png",
+      "96": "images/icons/96x96.png"
+    },
+    "default_title": "Untraceable",
+    "default_popup": "popup.html"
+  },
+
+  "content_security_policy": "script-src 'self' 'unsafe-inline'; object-src 'self'",
+
+  "permissions": [
+    "activeTab",
+    "bookmarks",
+    "browsingData",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "privacy",
+    "clipboardRead",
+    "clipboardWrite",
+    "contentSettings",
+    "contextMenus",
+    "cookies",
+    "identity",
+    "tts",
+    "ttsEngine",
+    "history",
+    "idle",
+    "management",
+    "notifications",
+    "tabs",
+    "activeTab",
+    "geolocation",
+    "http://*/*",
+    "https://*/*"
+  ],
+
+  "content_scripts": [
+    {
+      "js": [
+        "dist/browser-polyfill.js",
+        "dist/inject.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "match_about_blank": true,
+      "all_frames": true,
+      "run_at": "document_start"
+    }
+  ],
+
+  "background": {
+    "scripts": [
+      "dist/browser-polyfill.js",
+      "dist/background.js"
+    ]
+  }
+}

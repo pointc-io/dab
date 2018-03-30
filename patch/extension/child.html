@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript">
+    function reloadFrame() {
+      var element = document.getElementById('sandboxed');
+      element.removeAttribute('sandbox');
+//      element.setAttribute('sandbox', 'allow-scripts');
+
+      var sibling = element.nextElementSibling;
+      var parent = element.parentNode;
+
+      parent.removeChild(element);
+
+      var newElement = document.createElement('iframe');
+      newElement.setAttribute('src', 'about:blank');
+
+      if (sibling) {
+        parent.insertBefore(newElement, sibling);
+      } else {
+        parent.appendChild(newElement);
+      }
+
+//      element.setAttribute('sandbox', 'allow-same-origin');
+
+//      parent.removeChild(element);
+//      if (sibling) {
+//        parent.insertBefore(element, sibling);
+//      } else {
+//        parent.appendChild(element);
+//      }
+    }
+  </script>
+</head>
+<body>
+<script type="text/javascript">
+  document.write(navigator.appCodeName);
+</script>
+<button type="button" onclick="reloadFrame()">Reload</button>
+<iframe id="sandboxed" sandbox="allow-same-origin" style="display:none"></iframe>
+<!--<iframe id="p" sandbox="allow-same-origin" style="width:500px; height: 500px;" src="popup.html"></iframe>-->
+<!--<iframe id="sandboxed2" sandbox="" style="display:none"></iframe>-->
+<!--<iframe id="sandboxed10" sandbox="allow-top-navigation" style="display:none"></iframe>-->
+<!--<iframe id="sandboxed3" sandbox="allow-scripts" src="https://untraceable.me"></iframe>-->
+<!--<iframe id="sandboxed30" src="https://browserleaks.com/javascript" width="800" height="700"></iframe>-->
+</body>
+</html>
