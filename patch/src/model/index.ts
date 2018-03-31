@@ -6,14 +6,8 @@ interface UtString {
 
 }
 
-interface UtNumber {
-  toLocaleString?: string;
-}
+interface UtWebGL2 {
 
-interface UtDate {
-  toLocaleString?: string;
-  toLocaleDateString?: string;
-  toLocaleTimeString?: string;
 }
 
 interface UtWebGL {
@@ -127,44 +121,6 @@ interface UtFonts {
 
 interface UtCollator {
 
-}
-
-interface UtDateFormat {
-  optionsModel?: UtJsModel;
-  fields?: string[];
-  // undefinedFields: string[];
-
-  changed?: number;
-  timezoneOffset?: number;
-  locale?: string;
-  calendar?: string;
-  numberingSystem?: string;
-  timeZone?: string;
-  hour12?: boolean;
-  weekday?: string;
-  era?: string;
-  year?: string;
-  month?: string;
-  day?: string;
-  hour?: string;
-  minute?: string;
-  second?: string;
-  timeZoneName?: string;
-}
-
-interface UtNumberFormat {
-  fields?: string[];
-  locale?: string;
-  numberingSystem?: string;
-  style: string;
-  currency?: string;
-  currencyDisplay?: string;
-  minimumIntegerDigits?: number;
-  minimumFractionDigits?: number;
-  maximumFractionDigits?: number;
-  minimumSignificantDigits?: number;
-  maximumSignificantDigits?: number;
-  useGrouping?: boolean;
 }
 
 interface UtNavigator {

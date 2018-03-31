@@ -6,7 +6,6 @@ import (
 	"os/signal"
 	"os/user"
 	"path/filepath"
-	"runtime"
 	"syscall"
 
 	"github.com/getlantern/systray"
@@ -24,14 +23,13 @@ var port uint16
 var console bool
 var path string
 var loglevel int
-var singlemode bool
 
 func defaultPath() string {
 	usr, err := user.Current()
 	if err == nil {
 		return ""
 	}
-	return filepath.Join(usr.HomeDir, ".dab")
+	return filepath.Join(usr.HomeDir, fmt.Sprintf(".%s", dab.Name))
 }
 
 // Viper init
@@ -74,13 +72,6 @@ func configureStart(cmd *cobra.Command) {
 		"d",
 		defaultPath(),
 		"Root data directory",
-	)
-	cmd.Flags().BoolVarP(
-		&singlemode,
-		"singlemode",
-		"s",
-		false,
-		"Start the cluster in single mode",
 	)
 }
 
@@ -151,33 +142,35 @@ func main() {
 
 	// Let's get started!
 	cmdRoot.Execute()
-
-	// Should be called at the very beginning of main().
-	systray.Run(onReady, onExit)
 }
 
-func onReady() {
+func buildTray() {
 	systray.SetIcon(icon.Data)
 	systray.SetTitle("Awesome App")
 	systray.SetTooltip("Pretty awesome超级棒")
 	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
 	_ = mQuit
 
-	select {
-	case <-mQuit.ClickedCh:
-		fmt.Println("Quit Clicked")
-		os.Exit(100)
-	}
+	go func() {
+		select {
+		case <-mQuit.ClickedCh:
+			fmt.Println("Quit Clicked")
+			os.Exit(100)
+		}
+	}()
 }
 
-func onExit() {
+func onTrayExit() {
 	// clean up here
-	fmt.Println("onExit")
+	fmt.Println("onTrayExit")
 }
 
 func start(cmd *cobra.Command, args []string) {
 	// Change logger to Daemon Logger
 	dab.Logger = dab.DaemonLogger(console)
+
+	// Should be called at the very beginning of main().
+	systray.Run(buildTray, onTrayExit)
 
 	zerolog.SetGlobalLevel(zerolog.Level(loglevel))
 	zerolog.TimeFieldFormat = ""
@@ -195,12 +188,13 @@ func start(cmd *cobra.Command, args []string) {
 
 	// Create, Start and Wait for Daemon to exit
 	app := &Daemon{}
-	app.BaseService = *service.NewBaseService(dab.Logger, "daemon", app)
+	app.BaseService = *service.NewBaseService(dab.Logger, dab.Name, app)
 	err := app.Start()
 	if err != nil {
 		dab.Logger.Error().Err(err)
 		return
 	}
+
 	app.Wait()
 }
 

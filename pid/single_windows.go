@@ -4,7 +4,6 @@ package single
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -35,7 +34,7 @@ func (s *Single) Lock() LockResult {
 	}
 	s.file = file
 
-	_, err = f.Write([]byte(fmt.Sprintf("%d\n%d", os.Getpid(), 0)))
+	_, err = file.Write([]byte(fmt.Sprintf("%d\n%d", os.Getpid(), 0)))
 	if err != nil {
 		s.Unlock()
 		return LockResult{

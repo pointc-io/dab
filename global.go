@@ -2,6 +2,7 @@ package dab
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -19,8 +20,8 @@ var (
 	ErrInvalid = errors.New("invalid")
 )
 
-var Name = "dabd"
-var VersionStr = "0.1.0-1" // SemVer
+const Name = "dabd"
+const VersionStr = "0.1.0-1" // SemVer
 var Version semver.Version
 var GIT = ""
 var Logger = CLILogger()
@@ -33,7 +34,7 @@ func init() {
 		panic(err)
 	}
 
-	Path = filepath.Join(usr.HomeDir, ".sliced")
+	Path = filepath.Join(usr.HomeDir, fmt.Sprintf(".%s", Name))
 	err = os.MkdirAll(Path, 0700)
 	if err != nil {
 		panic(err)
@@ -57,11 +58,11 @@ func DaemonLogger(dev bool) zerolog.Logger {
 		return CLILogger()
 	}
 
-	l := zerolog.New(os.Stdout)
-	//l := zerolog.New(zerolog.ConsoleWriter{
-	//	Out:     os.Stdout,
-	//	NoColor: false,
-	//})
+	//l := zerolog.New(os.Stdout)
+	l := zerolog.New(zerolog.ConsoleWriter{
+		Out:     os.Stdout,
+		NoColor: false,
+	})
 	l = l.With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	return l
