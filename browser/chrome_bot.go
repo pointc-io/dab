@@ -45,8 +45,8 @@ func RunBot() {
 		log.Fatal(err)
 	}
 
-	c.Run(ctxt, chromedp.Navigate("http://browserleaks.com/javascript"))
-	time.Sleep(time.Second * 10000)
+	//c.Run(ctxt, chromedp.Navigate("http://browserleaks.com/javascript"))
+	//time.Sleep(time.Second * 10000)
 
 	// run task list
 	var site, res string

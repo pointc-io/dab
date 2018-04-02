@@ -1,14 +1,14 @@
-import backgroundStore from '../stores';
-import {decrementBackgroundCounter, incrementBackgroundCounter} from '../actions';
-import RunAt = browser.extensionTypes.RunAt;
-
-// increment or decrement background counter every second
-setTimeout(() => {
-  backgroundStore.dispatch(Math.random() >= 0.5 ?
-      incrementBackgroundCounter() :
-      decrementBackgroundCounter()
-  );
-}, 1000);
+// import backgroundStore from '../stores';
+// import {decrementBackgroundCounter, incrementBackgroundCounter} from '../actions';
+// import RunAt = browser.extensionTypes.RunAt;
+//
+// // increment or decrement background counter every second
+// setTimeout(() => {
+//   backgroundStore.dispatch(Math.random() >= 0.5 ?
+//       incrementBackgroundCounter() :
+//       decrementBackgroundCounter()
+//   );
+// }, 1000);
 
 // let injectProps: browser.extensionTypes.InjectDetails = {
 //   allFrames: true,
@@ -40,6 +40,32 @@ setTimeout(() => {
 //   console.log(r);
 // });
 
+// browser.runtime.onMessage.addListener((request: any, sender: any, sendResponse: any): any => {
+//     console.log("Background");
+//     console.log(request);
+//     console.log(sender);
+//     sendResponse('BYE');
+// });
+
+browser.runtime.onConnect.addListener(function (port) {
+    console.assert(port.name == "background");
+
+    port.onDisconnect.addListener(function (msg: any) {
+        console.log("disconnected!!!");
+    });
+
+    port.onMessage.addListener(function (msg: any) {
+        console.log(msg);
+        port.postMessage({
+                navigator: {
+                    userAgent: 'Modilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.2228.0 Safari/537.36'
+                }
+            }
+        );
+    });
+});
+
+
 /*
 Initialize the UA to Firefox 41.
 */
@@ -49,12 +75,19 @@ var ua = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Ch
 Rewrite the User-Agent header to "ua".
 */
 function rewriteUserAgentHeader(e: any) {
-  for (var header of e.requestHeaders) {
-    if (header.name.toLowerCase() === "user-agent") {
-      header.value = ua;
+    for (let header of e.requestHeaders) {
+        let n = header.name.toLowerCase();
+
+        switch (n) {
+            case 'user-agent':
+                header.value = ua;
+                break;
+
+            case 'accept':
+                break;
+        }
     }
-  }
-  return {requestHeaders: e.requestHeaders};
+    return {requestHeaders: e.requestHeaders};
 }
 
 /*
@@ -70,5 +103,5 @@ browser.webRequest.onBeforeSendHeaders.addListener(rewriteUserAgentHeader,
 Update ua to a new value, mapped from the uaString parameter.
 */
 export function setUa(uaString: string) {
-  ua = uaString;
+    ua = uaString;
 }

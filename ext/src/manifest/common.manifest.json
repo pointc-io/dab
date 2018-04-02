@@ -1,0 +1,37 @@
+{
+  "name": "Untraceable Fingerprint Patch",
+  "description": "Extension to patch a browser with a unique Untraceable Fingerprint",
+
+  "icons": {
+    "16": "static/logo.png",
+    "48": "static/logo.png",
+    "128": "static/logo.png"
+  },
+
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["<all_urls>"],
+      "match_about_blank": true,
+      "all_frames": true,
+      "run_at": "document_start"
+    }
+  ],
+
+  "browser_action": {
+    "default_icon": {
+      "19": "static/logo.png",
+      "38": "static/logo.png"
+    },
+    "default_popup": "popup.html"
+  },
+
+  "manifest_version": 2,
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

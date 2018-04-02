@@ -146,8 +146,8 @@ func main() {
 
 func buildTray() {
 	systray.SetIcon(icon.Data)
-	systray.SetTitle("Awesome App")
-	systray.SetTooltip("Pretty awesome超级棒")
+	systray.SetTitle("DAB")
+	systray.SetTooltip("Browser privacy tool")
 	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
 	_ = mQuit
 

@@ -21,12 +21,12 @@ interface PopupState {
 }
 
 class ActiveTabPopup extends Component {
-    static propTypes = {
-        backgroundCounter: PropTypes.number.isRequired,
-        uiCounter: PropTypes.number.isRequired,
-        incrementUICounter: PropTypes.func.isRequired,
-        decrementUICounter: PropTypes.func.isRequired
-    };
+    // static propTypes = {
+    //     backgroundCounter: PropTypes.number.isRequired,
+    //     uiCounter: PropTypes.number.isRequired,
+    //     incrementUICounter: PropTypes.func.isRequired,
+    //     decrementUICounter: PropTypes.func.isRequired
+    // };
 
     state: PopupState;
     props: PopupProps;

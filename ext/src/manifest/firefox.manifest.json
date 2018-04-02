@@ -1,0 +1,8 @@
+{
+  "applications": {
+    "gecko": {
+      "id": "dev@pointc.io",
+      "strict_min_version": "58.0"
+    }
+  }
+}
