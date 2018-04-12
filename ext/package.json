@@ -1,6 +1,6 @@
 {
-  "name": "jumper-fingerprint-patch",
-  "version": "0.1.0",
+  "name": "untraceable-extension",
+  "version": "0.1.1",
   "description": "Web Extension to patch the browser with a new fingerprint",
   "private": true,
   "scripts": {
@@ -10,8 +10,7 @@
     "devbuild": "node scripts/devbuild.js",
     "test": "node scripts/test.js --env=jsdom",
     "commit": "git-cz",
-    "release": "standard-version",
-    "commitmsg": "commitlint -e $GIT_PARAMS"
+    "release": "standard-version"
   },
   "engines": {
     "node": ">= 8.0.0",
@@ -27,15 +26,12 @@
   "bugs": {
     "url": "https://github.com/pointc-io/dab/issues"
   },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
   "dependencies": {
     "@types/node": "^9.4.0",
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
+    "mobx": "^4.1.1",
+    "mobx-react": "^5.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "web-ext-types": "^2.0.1",
