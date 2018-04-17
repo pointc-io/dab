@@ -63,6 +63,7 @@
   console.log('After - IFrame Loaded');
   document.write(this[0].navigator.appCodeName);
   document.write(this[1].navigator.appCodeName);
+  document.write(document.getElementById('s').contentWindow.navigator.appCodeName);
 </script>
 <!--&lt;!&ndash;<iframe id="sandboxed100" style="display:none"></iframe>&ndash;&gt;-->
 

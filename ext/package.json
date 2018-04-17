@@ -6,11 +6,16 @@
   "scripts": {
     "start": "node scripts/start.js",
     "dev": "node scripts/start.js",
-    "build": "node scripts/build.js",
+    "build": "node $NODE_DEBUG_OPTION scripts/build.js",
     "devbuild": "node scripts/devbuild.js",
     "test": "node scripts/test.js --env=jsdom",
-    "commit": "git-cz",
     "release": "standard-version"
+  },
+  "aliasify": {
+    "aliases": {
+      "react": "preact-compat",
+      "react-dom": "preact-compat"
+    }
   },
   "engines": {
     "node": ">= 8.0.0",
@@ -27,13 +32,21 @@
     "url": "https://github.com/pointc-io/dab/issues"
   },
   "dependencies": {
+    "@blueprintjs/core": "^2.1.1",
+    "@blueprintjs/icons": "^2.1.1",
+    "@blueprintjs/select": "^2.0.0",
     "@types/node": "^9.4.0",
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
+    "@types/react-transition-group": "^2.0.8",
     "mobx": "^4.1.1",
     "mobx-react": "^5.0.0",
+    "module-alias": "^2.0.6",
+    "preact": "^8.2.7",
+    "preact-compat": "^3.18.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-transition-group": "^2.3.0",
     "web-ext-types": "^2.0.1",
     "webextension-polyfill": "^0.2.1"
   },
@@ -42,6 +55,7 @@
     "@commitlint/config-conventional": "^6.0.2",
     "@types/jest": "^22.0.1",
     "@types/sinon-chrome": "^2.2.0",
+    "aliasify": "^2.1.0",
     "autoprefixer": "^7.2.5",
     "babel-core": "6.26.0",
     "babel-jest": "^22.1.0",

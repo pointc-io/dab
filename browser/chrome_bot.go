@@ -7,12 +7,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/exec"
 	"time"
 
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/runner"
-	"os/exec"
 )
 
 func RunBot() {
@@ -22,21 +23,26 @@ func RunBot() {
 	ctxt, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	os.RemoveAll("/Users/clay/.dab/profiles/d3")
 	var options []runner.CommandLineOption
-	options = append(options, runner.UserDataDir("/Users/clay/.dab/profiles/d1"))
-	options = append(options, runner.Path("/Applications/Opera.app/Contents/MacOS"))
-	options = append(options, runner.ExecPath("/Applications/Opera.app/Contents/MacOS/Opera"))
-	options = append(options, runner.Flag("load-extension", "/Users/clay/go/src/github.com/pointc-io/dab/patch/extension,/Users/clay/.dab/ublock/1.15.18/uBlock0.chromium"))
+	options = append(options, runner.NoFirstRun)
+	options = append(options, runner.NoDefaultBrowserCheck)
+	options = append(options, runner.UserDataDir("/Users/clay/.dab/profiles/d3"))
+	//options = append(options, runner.Path("/Applications/Vivaldi.app/Contents/MacOS"))
+	//options = append(options, runner.ExecPath("/Applications/Opera.app/Contents/MacOS/Opera"))
+	//options = append(options, runner.ExecPath("/Applications/Vivaldi.app/Contents/MacOS/Vivaldi"))
+	options = append(options, runner.Flag("load-extension", "/Users/clay/go/src/github.com/pointc-io/dab/ext/build/chrome,/Users/clay/.dab/ublock/1.15.18/uBlock0.chromium"))
 	options = append(options, runner.Flag("disable-infobars", nil))
+	options = append(options, runner.Flag("cast-initial-screen-width", 600))
 	options = append(options, runner.CmdOpt(func(cmd *exec.Cmd) error {
-		cmd.Env = append(cmd.Env, "TZ=America/Los_Angeles")
+		cmd.Env = append(cmd.Env, "TZ=America/New_York")
 		return nil
 	}))
 
 	//r, err := runner.New(options...)
 
 	var opts []chromedp.Option
-	opts = append(opts, chromedp.WithLog(log.Printf))
+	//opts = append(opts, chromedp.WithLog(log.Printf))
 	opts = append(opts, chromedp.WithRunnerOptions(options...))
 
 	// create chrome instance
@@ -45,8 +51,8 @@ func RunBot() {
 		log.Fatal(err)
 	}
 
-	//c.Run(ctxt, chromedp.Navigate("http://browserleaks.com/javascript"))
-	//time.Sleep(time.Second * 10000)
+	c.Run(ctxt, chromedp.Navigate("http://browserleaks.com/javascript"))
+	time.Sleep(time.Second * 10000)
 
 	// run task list
 	var site, res string

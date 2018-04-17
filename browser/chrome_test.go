@@ -34,7 +34,7 @@ func TestChromeContext_Launch(t *testing.T) {
 			fmt.Printf("Result: %s", result)
 		}
 
-	case <-time.After(time.Second * 300):
+	case <-time.After(time.Second * 300000):
 		fmt.Println("Timed Out!")
 		browser.Close()
 

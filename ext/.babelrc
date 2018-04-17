@@ -1,4 +1,8 @@
 {
+  "plugins": [
+    ["transform-react-jsx", { "pragma": "h" }]
+  ],
+
   "env": {
     "test": {
       "presets": [
@@ -12,7 +16,9 @@
         "react"
       ],
       "plugins": [
-        ["transform-object-rest-spread", { "useBuiltIns": true }]
+        ["transform-object-rest-spread", { "useBuiltIns": true }],
+        ["transform-decorators-legacy"],
+        ["transform-react-jsx", { "pragma": "h" }]
       ]
     },
     "development": {
@@ -27,7 +33,9 @@
         "react"
       ],
       "plugins": [
-        ["transform-object-rest-spread", { "useBuiltIns": true }]
+        ["transform-object-rest-spread", { "useBuiltIns": true }],
+        ["transform-decorators-legacy"],
+        ["transform-react-jsx", { "pragma": "h" }]
       ]
     },
     "production": {
@@ -42,7 +50,9 @@
         "react"
       ],
       "plugins": [
-        ["transform-object-rest-spread", { "useBuiltIns": true }]
+        ["transform-object-rest-spread", { "useBuiltIns": true }],
+        ["transform-decorators-legacy"],
+        ["transform-react-jsx", { "pragma": "h" }]
       ]
     }
   }
