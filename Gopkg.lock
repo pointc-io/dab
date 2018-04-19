@@ -164,6 +164,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/kardianos/osext"
+  packages = ["."]
+  revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
+
+[[projects]]
+  branch = "master"
   name = "github.com/knq/snaker"
   packages = ["."]
   revision = "d9ad1e7f342a5b58202aa92c5f1106d7bb8b9c73"
@@ -208,6 +214,12 @@
   packages = ["."]
   revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
   version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/qrtz/nativemessaging"
+  packages = ["."]
+  revision = "f4769a80e040056dd57d0841a5f1f7cedbcdd251"
 
 [[projects]]
   branch = "master"
@@ -266,6 +278,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/zserge/webview"
+  packages = ["."]
+  revision = "02aa1dcf62a15f2c1e2197a07642e9c474ac32fa"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/image"
   packages = [
     "bmp",
@@ -277,7 +295,11 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = [
+    "unix",
+    "windows",
+    "windows/registry"
+  ]
   revision = "378d26f46672a356c46195c28f61bdb4c0a781dd"
 
 [[projects]]
@@ -302,6 +324,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "619dac645af3d7e9f084be79e8b56370112973e1963e12ed2f17d97a0f828495"
+  inputs-digest = "766a8ddcd12cdd1a6bc1ce755b712dbb7c13f18e1e7721d56c881b51b85e9e69"
   solver-name = "gps-cdcl"
   solver-version = 1

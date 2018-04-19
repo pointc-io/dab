@@ -2,23 +2,26 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
 	"os/signal"
 	"os/user"
 	"path/filepath"
+	"runtime"
 	"syscall"
 
 	"github.com/getlantern/systray"
 	"github.com/pointc-io/dab"
+	//_ "github.com/pointc-io/dab/assets/ext/chrome"
 	"github.com/pointc-io/dab/assets/logo"
+	//_ "github.com/pointc-io/dab/assets/ui"
 	"github.com/pointc-io/dab/pid"
 	"github.com/pointc-io/dab/service"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	_ "github.com/pointc-io/dab/assets/ext/chrome"
-	_ "github.com/pointc-io/dab/assets/ui"
+	"github.com/zserge/webview"
 )
 
 var version = "master"
@@ -26,9 +29,6 @@ var port uint16
 var console bool
 var path string
 var loglevel int
-
-var trayPID *single.Single
-var uiPID *single.Single
 
 func defaultPath() string {
 	usr, err := user.Current()
@@ -94,14 +94,6 @@ func main() {
 	}
 	configureStart(cmdStart)
 
-	var cmdUI = &cobra.Command{
-		Use:   "ui",
-		Short: "Opens the UI App",
-		Long:  ``,
-		Args:  cobra.MinimumNArgs(0),
-		Run:   runUI,
-	}
-
 	var cmdStatus = &cobra.Command{
 		Use:   "status",
 		Short: "Prints the current status of " + dab.Name,
@@ -118,6 +110,24 @@ func main() {
 				dab.Logger.Info().Msgf("daemon pid %d", l.Pid)
 			}
 		},
+	}
+
+	var cmdInfo = &cobra.Command{
+		Use:   "info",
+		Short: "Outputs app info",
+		Long:  ``,
+		Args:  cobra.MinimumNArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			ensureDaemon()
+		},
+	}
+
+	var cmdService = &cobra.Command{
+		Use:   "service",
+		Short: "Starts the backend daemon service",
+		Long:  ``,
+		Args:  cobra.MinimumNArgs(0),
+		Run:   startService,
 	}
 
 	var force bool
@@ -152,46 +162,45 @@ func main() {
 			fmt.Println(fmt.Sprintf("%s %s", dab.Name, dab.VersionStr))
 		},
 	})
-	cmdRoot.AddCommand(cmdStart, cmdUI, cmdStop, cmdStatus)
+	cmdRoot.AddCommand(cmdStart, cmdService, cmdStop, cmdStatus, cmdInfo)
 
 	// Let's get started!
 	cmdRoot.Execute()
 }
 
-func buildTray() {
-	systray.SetIcon(logo.Logo)
-	systray.SetTitle("Untraceable")
-	systray.SetTooltip("Anonymity tools")
-
-	open := systray.AddMenuItem("Open Dashboard", "Open the console window to start or stop new sessions")
-	systray.AddSeparator()
-	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
-	_ = mQuit
-
-	go func() {
-		for {
-			select {
-			case <-open.ClickedCh:
-
-			case <-mQuit.ClickedCh:
-				fmt.Println("Quit Clicked")
-				os.Exit(100)
-			}
-		}
-	}()
-}
-
-func onTrayExit() {
-	// clean up here
-	fmt.Println("onTrayExit")
-}
-
-func start(cmd *cobra.Command, args []string) {
+func startService(cmd *cobra.Command, args []string) {
 	// Change logger to Daemon Logger
 	dab.Logger = dab.DaemonLogger(console)
 
 	// Should be called at the very beginning of main().
-	systray.Run(buildTray, onTrayExit)
+	systray.Run(
+		func() {
+			systray.SetIcon(logo.Logo)
+			systray.SetTitle("Untraceable")
+			systray.SetTooltip("Anonymity tools")
+
+			open := systray.AddMenuItem("Open Dashboard", "Open the console window to start or stop new sessions")
+			systray.AddSeparator()
+			mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
+			_ = mQuit
+
+			go func() {
+				for {
+					select {
+					case <-open.ClickedCh:
+
+					case <-mQuit.ClickedCh:
+						fmt.Println("Quit Clicked")
+						os.Exit(100)
+					}
+				}
+			}()
+		},
+		func() {
+			// clean up here
+			fmt.Println("onTrayExit")
+		},
+	)
 
 	zerolog.SetGlobalLevel(zerolog.Level(loglevel))
 	zerolog.TimeFieldFormat = ""
@@ -219,23 +228,84 @@ func start(cmd *cobra.Command, args []string) {
 	app.Wait()
 }
 
-func runUI(cmd *cobra.Command, args []string) {
+func start(cmd *cobra.Command, args []string) {
+	// Change logger to Daemon Logger
+	dab.Logger = dab.DaemonLogger(console)
 
+	ensureDaemon()
+
+	zerolog.SetGlobalLevel(zerolog.Level(loglevel))
+	zerolog.TimeFieldFormat = ""
+
+	if !console {
+		// Ensure only 1 instance through PID lock
+		pidfile := single.New(dab.Name)
+		lockResult := pidfile.Lock()
+		if !lockResult.Success {
+			dab.Logger.Error().Msgf("process already running pid:%d -- localhost:%d", lockResult.Pid, lockResult.Port)
+			return
+		}
+		defer pidfile.Unlock()
+	}
+
+	wv := webview.New(webview.Settings{
+		Title: "Untraceable",
+		//URL:       "https://untraceable.me",
+		URL:       "http://127.0.0.1:3000",
+		Width:     800,
+		Height:    500,
+		Resizable: true,
+	})
+
+	// Create, Start and Wait for Daemon to exit
+	app := &Daemon{}
+	app.BaseService = *service.NewBaseService(dab.Logger, dab.Name, app)
+	err := app.Start()
+	if err != nil {
+		dab.Logger.Error().Err(err)
+		return
+	}
+
+	defer wv.Exit()
+	wv.SetColor(22, 22, 22, 255)
+	wv.Run()
+	//webview.Open("Jumper", "https://en.m.wikipedia.org/wiki/Main_Page", 800, 500, false)
+
+	app.Stop()
+	app.Wait()
 }
 
-func launch(ui bool) {
-	//trayPID := single.New(dab.Name)
-	//lock := trayPID.Lock()
-	//if lock.Success {
-	//	trayPID.Unlock()
-	//
-	//	runtime.Call
-	//
-	//	os.Executable()
-	//
-	//	os.StartProcess()
-	//}
-	//uiPID := single.New(fmt.Sprintf("%s-ui", dab.Name))
+const (
+	UID  = 501
+	GUID = 100
+)
+
+func ensureDaemon() {
+	executable, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(executable)
+
+	execPath := executable
+	if runtime.GOOS == "darwin" {
+		dir := filepath.Dir(filepath.Dir(executable))
+		execPath = filepath.Join(dir, "bin", "app")
+
+		if _, err := os.Stat(execPath); os.IsNotExist(err) {
+			execPath = executable
+		}
+	}
+
+	fmt.Println(execPath)
+
+	c := exec.Command(execPath, "service")
+	err = c.Start()
+	if err != nil {
+		return
+	}
+	// Detach from parent
+	c.Process.Release()
 }
 
 func stop(force bool) {
@@ -281,6 +351,8 @@ func stop(force bool) {
 
 type Daemon struct {
 	service.BaseService
+
+	wv webview.WebView
 }
 
 func (d *Daemon) OnStart() error {

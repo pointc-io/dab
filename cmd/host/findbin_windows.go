@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-const utnmBinary = "nm.exe"
+const utnmBinary = "host.exe"
 const untraceableBinary = "untraceable.exe"
 
 // guessUntraceablePath makes a platform-specific guess to where the binary might

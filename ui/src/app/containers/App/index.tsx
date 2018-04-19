@@ -98,7 +98,7 @@ export class UtApp extends React.Component<TodoAppProps, TodoAppState> {
             Create a New Device Fingerprint
           </div>
         </div>
-        {/*{footer}*/}
+        {footer}
         {children}
       </div>
     );

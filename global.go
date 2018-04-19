@@ -20,7 +20,7 @@ var (
 	ErrInvalid = errors.New("invalid")
 )
 
-const Name = "dabd"
+const Name = "untraceable"
 const VersionStr = "0.1.0-1" // SemVer
 var Version semver.Version
 var GIT = ""

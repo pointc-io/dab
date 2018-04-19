@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/pointc-io/dab/cmd/utnm/installer"
+	"github.com/pointc-io/dab/cmd/host/installer"
 	"github.com/qrtz/nativemessaging"
 )
 

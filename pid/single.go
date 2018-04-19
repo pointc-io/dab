@@ -14,7 +14,7 @@ import (
 var (
 	// ErrAlreadyRunning
 	ErrAlreadyRunning = errors.New("the program is already running")
-	ErrPIDInvalid     = errors.New("PID in lockfile is invalid")
+	ErrPIDInvalid     = errors.New("pid in lock-file is invalid")
 	//
 	Lockfile string
 )

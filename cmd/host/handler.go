@@ -171,10 +171,10 @@ func parseError(r io.Reader, fallback error) error {
 			continue
 		}
 		// Check some error states we know about:
-		if strings.Contains(line, "Keybase isn't running.") {
+		if strings.Contains(line, "Untraceable isn't running.") {
 			return errKeybaseNotRunning
 		}
-		if strings.Contains(line, "You are not logged into Keybase.") {
+		if strings.Contains(line, "You are not logged into Untraceable.") {
 			return errKeybaseNotLoggedIn
 		}
 		parts := strings.SplitN(line, " ", 3)
@@ -215,7 +215,7 @@ func (h *handler) handleQuery(req *Request) (*resultQuery, error) {
 	// Unfortunately `keybase id ...` does not support JSON output, so we parse the output
 	var out bytes.Buffer
 	cmd := exec.Command(binPath, "id", idQuery)
-	cmd.Env = append(os.Environ(), "KEYBASE_LOG_FORMAT=plain")
+	cmd.Env = append(os.Environ(), "UNTRACEABLE_LOG_FORMAT=plain")
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 

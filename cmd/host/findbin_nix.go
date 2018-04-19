@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-const utnmBinary = "utnm"
+const utnmBinary = "host"
 const untraceableBinary = "untraceable"
 
 // guessUntraceablePath makes a platform-specific guess to where the binary might

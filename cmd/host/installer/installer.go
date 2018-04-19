@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pointc-io/dab/cmd/utnm/hostmanifest"
+	"github.com/pointc-io/dab/cmd/host/hostmanifest"
 )
 
 const utnmAppName = "me.untraceable.messagehost"
