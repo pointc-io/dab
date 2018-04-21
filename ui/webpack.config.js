@@ -47,7 +47,7 @@ module.exports = {
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
                     use: [
-                        require.resolve('style-loader'),
+                        // require.resolve('style-loader'),
                         {
                             loader: 'css-loader',
                             query: {
@@ -124,7 +124,7 @@ module.exports = {
                 removeStyleLinkTypeAttributes: true,
                 keepClosingSlash: true,
                 minifyJS: true,
-                minifyCSS: false,
+                minifyCSS: true,
                 minifyURLs: false,
             }
         })

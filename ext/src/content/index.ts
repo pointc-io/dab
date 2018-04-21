@@ -1,88 +1,114 @@
-if (window.self === window.top) {
-  const start = window.performance.now()
-  let PROFILE = JSON.stringify({
-    navigator: {
-      // appCodeName: 'UT',
-      // appVersion: '1.0',
-      platform: 'MacIntel',
-      // userAgent: 'Modilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.2228.0 Safari/537.36',
-
-      connection: {
-        downlink: 22.2,
-        effectiveType: 'uber-10g',
-        rtt: 5000,
-        saveData: false,
-      },
-
-      mediaDevices: [
-        {
-          deviceId: 'default',
-          kind: 'audioinput',
-          label: '',
-          groupId: '06a0a735d20f05dff62753e893335965186a63b701078e6ee961ce3fccaf7a8c',
-        },
-        {
-          deviceId: 'bc14817bcb046ce9c9e63ecdf68209925dd84657817c18b0579f77e727698048',
-          kind: 'audioinput',
-          label: '',
-          groupId: '06a0a735d20f05dff62753e893335965186a63b701078e6ee961ce3fccaf7a8c',
-        },
-        {
-          deviceId: 'b0e704b8787ba12df1d4d21dde69202affd05037f5f890cb3d3cde77722cca53',
-          kind: 'videoinput',
-          label: '',
-          groupId: '',
-        },
-        {
-          deviceId: 'default',
-          kind: 'audiooutput',
-          label: '',
-          groupId: '06a0a735d20f05dff62753e893335965186a63b701078e6ee961ce3fccaf7a8c',
-        },
-      ],
+let PROFILE = JSON.stringify({
+  screen: {
+    width: 802,
+    height: 803,
+    availWidth: 801,
+    availHeight: 802,
+    orientation: {
+      angle: 1,
+      type: 'special'
     },
-    screen: {
-      width: 802,
-      height: 803,
-      availWidth: 801,
-      availHeight: 802,
-      orientation: {
-        angle: 1,
-        type: 'special'
-      },
+  },
+
+  navigator: {
+    // appCodeName: 'UT',
+    // appVersion: '1.0',
+    platform: 'MacIntel',
+    // userAgent: 'Modilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.2228.0 Safari/537.36',
+
+    connection: {
+      downlink: 22.2,
+      effectiveType: 'uber-10g',
+      rtt: 5000,
+      saveData: false,
     },
-    webGL: {},
-    webGL2: {},
-    pixels: [
+
+    mediaDevices: [
       {
-        x: 0.23,
-        y: 0.10,
-        r: 255.0,
-        g: 36.0,
-        b: 0.0,
-      }
-    ]
-  })
+        deviceId: 'default',
+        kind: 'audioinput',
+        label: '',
+        groupId: '06a0a735d20f05dff62753e893335965186a63b701078e6ee961ce3fccaf7a8c',
+      },
+      {
+        deviceId: 'bc14817bcb046ce9c9e63ecdf68209925dd84657817c18b0579f77e727698048',
+        kind: 'audioinput',
+        label: '',
+        groupId: '06a0a735d20f05dff62753e893335965186a63b701078e6ee961ce3fccaf7a8c',
+      },
+      {
+        deviceId: 'b0e704b8787ba12df1d4d21dde69202affd05037f5f890cb3d3cde77722cca53',
+        kind: 'videoinput',
+        label: '',
+        groupId: '',
+      },
+      {
+        deviceId: 'default',
+        kind: 'audiooutput',
+        label: '',
+        groupId: '06a0a735d20f05dff62753e893335965186a63b701078e6ee961ce3fccaf7a8c',
+      },
+    ],
+  },
 
+  webGL: {
+    extensions: []
+  },
+
+  webGL2: {
+    extensions: []
+  },
+
+  pixels: [
+    {
+      x: 0.23,
+      y: 0.10,
+      r: 255.0,
+      g: 36.0,
+      b: 0.0,
+    }
+  ]
+})
+
+const start = window.performance.now()
+const $log = console.log
+
+function log (value: any) {
+  $log(value)
+}
+
+if (window.self === window.top) {
   const KEY = 'P'
-
-  // Create background request
   const REQUEST = {
     type: KEY,
   }
 
   // Connect to background page.
   let PORT = browser.runtime.connect('', { name: KEY })
-
-  PORT.postMessage(REQUEST)
-
   // Listen for messages
   PORT.onMessage.addListener((message: any) => {
     console.log(`RECEIVED MESSAGE in ${window.performance.now() - start} ms`)
   })
+  // Notify background
+  PORT.postMessage(REQUEST)
 
+  // Generate inject code
   const injectCode = `(${function (DEVICE: any) {
-    function HAS_VALUE (v: any): boolean {
+    /**
+     * Log out to console
+     *
+     * @param value
+     */
+    // function log (value: any) {
+    //   $log(value)
+    // }
+
+    /**
+     *
+     * @param v
+     * @returns {boolean}
+     */
+    function isSet (v: any): boolean {
       return v !== null && v !== undefined
     }
 
@@ -92,7 +118,7 @@ if (window.self === window.top) {
      * @returns {any}
      * @constructor
      */
-    function VAL_AT (...path: string[]): any {
+    function $model (...path: string[]): any {
       if (!path || path.length === 0) {
         return null
       }
@@ -101,7 +127,7 @@ if (window.self === window.top) {
       for (let i = 0; i < path.length; i++) {
         model = model[ path[ i ] ]
 
-        if (!HAS_VALUE(model)) {
+        if (!isSet(model)) {
           return null
         }
       }
@@ -116,7 +142,7 @@ if (window.self === window.top) {
      * @returns {any}
      * @constructor
      */
-    function VAL_FOR (or: any, graph: any, ...path: string[]): any {
+    function $valFor (or: any, graph: any, ...path: string[]): any {
       if (!path || path.length === 0) {
         return or
       }
@@ -125,7 +151,7 @@ if (window.self === window.top) {
       for (let i = 0; i < path.length; i++) {
         model = model[ path[ i ] ]
 
-        if (!HAS_VALUE(model)) {
+        if (!isSet(model)) {
           return or
         }
       }
@@ -139,8 +165,8 @@ if (window.self === window.top) {
      * @returns {any}
      * @constructor
      */
-    function VAL (or: any, ...path: string[]): any {
-      return VAL_FOR(or, DEVICE, ...path)
+    function $val (or: any, ...path: string[]): any {
+      return $valFor(or, DEVICE, ...path)
     }
 
     let isFirefox = window.hasOwnProperty('mozInnerScreenX')
@@ -149,17 +175,12 @@ if (window.self === window.top) {
     // let isEdge = false
     // let isSafari = false
 
-    let GET_OWN_PROPERTY_DESCRIPTORS = Object[ 'getOwnPropertyDescriptors' ]
-    let GET_OWN_PROPERTY_DESCRIPTOR = Object.getOwnPropertyDescriptor
-    let GET_OWN_PROPERTY_NAMES = Object.getOwnPropertyNames
-    
-    // let $WebGLRenderingContext_readPixels = window['WebGLRenderingContext'] ? 
-    if (window['WebGLRenderingContext']) {
-      
-    }
+    let $getOwnPropertyDescriptors = Object[ 'getOwnPropertyDescriptors' ]
+    let $getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor
+    let $getOwnPropertyNames = Object.getOwnPropertyNames
 
     // Interceptor map
-    let INTERCEPTOR_MAP = new WeakMap<any, any>()
+    let $interceptorMap = new WeakMap<any, any>()
 
     // interface Warning {
     //   level: number
@@ -174,9 +195,9 @@ if (window.self === window.top) {
     // }
 
     /**
-     * Shim to patch Function.prototype.toString/toSource on intercepted property.
+     * Shim to patch Function.prototype.toString/toSource on intercepted/overridden property.
      */
-    class Shim {
+    class Interceptee {
       constructor (public base: any) {
       }
 
@@ -204,7 +225,7 @@ if (window.self === window.top) {
        * @param {(base: (thisArg: any, argArray?: any) => any) => any} provider
        */
       intercept (name: string, provider: (base: (thisArg: any, argArray?: any) => any) => any): boolean {
-        let descriptor = GET_OWN_PROPERTY_DESCRIPTOR(this.proto, name)
+        let descriptor = $getOwnPropertyDescriptor(this.proto, name)
 
         if (!descriptor) {
           return false
@@ -222,8 +243,8 @@ if (window.self === window.top) {
           }
         })
 
-        if (HAS_VALUE(override)) {
-          this.overrideProp(name, descriptor, base, override)
+        if (isSet(override)) {
+          this.override(name, descriptor, base, override)
           return true
         } else {
           return false
@@ -238,12 +259,12 @@ if (window.self === window.top) {
        */
       define (provider: (name: string, base: (thisArg: any, argArray?: any) => any) => any) {
         let proto = this.proto
-        let names = GET_OWN_PROPERTY_NAMES(proto)
+        let names = $getOwnPropertyNames(proto)
 
         // Iterate through original descriptors.
         for (let i = 0; i < names.length; i++) {
           let name = names[ i ]
-          let descriptor = GET_OWN_PROPERTY_DESCRIPTOR(proto, name)
+          let descriptor = $getOwnPropertyDescriptor(proto, name)
           if (!descriptor) {
             continue
           }
@@ -257,8 +278,8 @@ if (window.self === window.top) {
             }
           })
 
-          if (HAS_VALUE(override)) {
-            this.overrideProp(name, descriptor, base, override)
+          if (isSet(override)) {
+            this.override(name, descriptor, base, override)
           } else {
             try {
               Object.defineProperty(this.proto, name, descriptor)
@@ -269,14 +290,21 @@ if (window.self === window.top) {
         }
       }
 
-      overrideProp (name: string,
-                    baseDescriptor: PropertyDescriptor,
-                    base: any,
-                    model: any) {
+      /**
+       *
+       * @param {string} name
+       * @param {PropertyDescriptor} baseDescriptor
+       * @param base
+       * @param model
+       */
+      override (name: string,
+                baseDescriptor: PropertyDescriptor,
+                base: any,
+                model: any) {
         if (!(model instanceof Function)) {
-          let shimProps = GET_OWN_PROPERTY_NAMES(model)
+          let shimProps = $getOwnPropertyNames(model)
           let getter = shimProps && shimProps.length > 0
-            ? GET_OWN_PROPERTY_DESCRIPTOR(model, shimProps[ 0 ])
+            ? $getOwnPropertyDescriptor(model, shimProps[ 0 ])
             : null
           if (getter && getter.get) {
             model = getter.get
@@ -284,7 +312,7 @@ if (window.self === window.top) {
         }
 
         let descriptor = {}
-        let descriptors = GET_OWN_PROPERTY_DESCRIPTORS(baseDescriptor)
+        let descriptors = $getOwnPropertyDescriptors(baseDescriptor)
         for (let name in descriptors) {
           let d = descriptors[ name ]
 
@@ -312,7 +340,7 @@ if (window.self === window.top) {
               }
 
               descriptor[ 'get' ] = value
-              INTERCEPTOR_MAP.set(value, new Shim(base))
+              $interceptorMap.set(value, new Interceptee(base))
               break
 
             case 'set':
@@ -320,7 +348,7 @@ if (window.self === window.top) {
 
             case 'value':
               descriptor[ 'value' ] = model
-              INTERCEPTOR_MAP.set(descriptor[ 'value' ], new Shim(base))
+              $interceptorMap.set(descriptor[ 'value' ], new Interceptee(base))
               break
 
             default:
@@ -330,6 +358,16 @@ if (window.self === window.top) {
         }
 
         Object.defineProperty(this.proto, name, descriptor)
+      }
+
+      /**
+       *
+       * @param {string} name
+       * @returns {any}
+       */
+      value (name: string): any {
+        let descriptor = $getOwnPropertyDescriptor(this.proto, name)
+        return descriptor ? descriptor.value : null
       }
     }
 
@@ -407,531 +445,20 @@ if (window.self === window.top) {
     //   }
     // }
 
-    /*****************************************************************************/
-    // Function overrides
-    /*****************************************************************************/
-
     /**
-     * Function.prototype is leak central! Every single patch is a user defined
-     * function which leaks it's own source code. This exposes the user to the
-     * fact that's it's been tampered with.
      *
-     * @param {any} win
-     * @param {Prototype} proto
      */
-    function patchFunction (win: any, proto: Prototype) {
-      let d = GET_OWN_PROPERTY_DESCRIPTOR(proto.proto, 'toString')
-      if (d) {
-        let base = d.value
-        d.value = function toString () {
-          let interceptor = INTERCEPTOR_MAP.get(this)
-          if (interceptor) {
-            return interceptor.toString()
-          }
-
-          return base.apply(this, arguments)
-        }
-        INTERCEPTOR_MAP.set(d.value, base.toString())
-        Object.defineProperty(proto.proto, 'toString', d)
-      }
-      d = GET_OWN_PROPERTY_DESCRIPTOR(proto.proto, 'toSource')
-      if (d) {
-        let base = d.value
-        d.value = function toSource () {
-          let interceptor = INTERCEPTOR_MAP.get(this)
-          if (interceptor) {
-            return interceptor.toString()
-          }
-
-          return base.apply(this, arguments)
-        }
-        INTERCEPTOR_MAP.set(d.value, base.toString())
-        Object.defineProperty(proto.proto, 'toSource', d)
-      }
-    }
-
-    /*****************************************************************************/
-    // Screen
-    /*****************************************************************************/
-
-    /**
-     * @param {any} win
-     * @param {Prototype} proto
-     */
-    function patchScreen (win: any, proto: Prototype) {
-      proto.define((name, base) => {
-        switch (name) {
-          case 'availHeight':
-            return {
-              get availHeight () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'availHeight'
-                )
-              }
-            }
-
-          case 'availLeft':
-            return {
-              get availLeft () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'availLeft'
-                )
-              }
-            }
-
-          case 'availTop':
-            return {
-              get availTop () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'availTop'
-                )
-              }
-            }
-
-          case 'availWidth':
-            return {
-              get availWidth () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'availWidth'
-                )
-              }
-            }
-
-          case 'colorDepth':
-            return {
-              get colorDepth () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'colorDepth'
-                )
-              }
-            }
-
-          case 'left':
-            return {
-              get left () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'left'
-                )
-              }
-            }
-
-          case 'width':
-            return {
-              get width () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'width'
-                )
-              }
-            }
-
-          case 'height':
-            return {
-              get height () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'height'
-                )
-              }
-            }
-
-          case 'mozOrientation':
-            return {
-              get mozOrientation () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'mozOrientation'
-                )
-              }
-            }
-
-          case 'orientation':
-            // Patch ScreenOrientation.prototype
-            patchOrientation(win)
-
-            // Orientation's prototype is intercepted so no need to intercept it's getter.
-            return null
-
-          case 'pixelDepth':
-            return {
-              get pixelDepth () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'pixelDepth'
-                )
-              }
-            }
-
-          case 'top':
-            return {
-              get top () {
-                return VAL(
-                  base(this, arguments),
-                  'screen', 'top'
-                )
-              }
-            }
-        }
-        return null
-      })
-    }
-
-    function patchOrientation (win: any) {
-      let model = VAL_AT('screen', 'orientation')
-      if (!model) {
-        return
-      }
-
-      let ScreenOrientation = win[ 'ScreenOrientation' ]
-      if (!ScreenOrientation) {
-        return
-      }
-
-      let proto = new Prototype(ScreenOrientation.prototype)
-      proto.define((name, base) => {
-        switch (name) {
-          case 'angle':
-            return {
-              get angle () {
-                return VAL_FOR(
-                  base(this, arguments),
-                  model,
-                  'angle'
-                )
-              }
-            }
-
-          case 'type':
-            return {
-              get type () {
-                return VAL_FOR(
-                  base(this, arguments),
-                  model,
-                  'type'
-                )
-              }
-            }
-        }
-        return null
-      })
-
-      return
-    }
-
-    /*****************************************************************************/
-    // Navigator
-    /*****************************************************************************/
-
-    /**
-     * @param {any} win
-     * @param {Prototype} proto
-     */
-    function patchNavigator (win: any, proto: Prototype) {
-      proto.define((name, base) => {
-        switch (name) {
-          case 'appCodeName':
-            return {
-              get appCodeName () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'appCodeName'
-                )
-              }
-            }
-
-          case 'appName':
-            return {
-              get appName () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'appName'
-                )
-              }
-            }
-
-          case 'appVersion':
-            return {
-              get appVersion () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'appVersion'
-                )
-              }
-            }
-
-          case 'bluetooth':
-            return null
-
-          case 'budget':
-            return null
-
-          case 'connection':
-            patchConnection(win)
-            return null
-
-          case 'cookieEnabled':
-            return null
-
-          case 'credentials':
-            return null
-
-          case 'deviceMemory':
-            return {
-              get deviceMemory () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'deviceMemory'
-                )
-              }
-            }
-
-          case 'doNotTrack':
-            return {
-              get doNotTrack () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'doNotTrack'
-                )
-              }
-            }
-
-          case 'geolocation':
-            return null
-
-          case 'hardwareConcurrency':
-            return {
-              get hardwareConcurrency () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'hardwareConcurrency'
-                )
-              }
-            }
-
-          case 'language':
-            return {
-              get language () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'language'
-                )
-              }
-            }
-
-          case 'languages':
-            return {
-              get languages () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'languages'
-                )
-              }
-            }
-
-          case 'maxTouchPoints':
-            return {
-              get maxTouchPoints () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'maxTouchPoints'
-                )
-              }
-            }
-
-          case 'mediaDevices':
-            patchMediaDevices(win)
-            return null
-
-          case 'mimeTypes':
-            patchMimeTypes(win)
-            return null
-
-          case 'onLine':
-            return {
-              get maxTouchPoints () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'onLine'
-                )
-              }
-            }
-
-          case 'permissions':
-            return null
-
-          case 'platform':
-            return {
-              get platform () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'platform'
-                )
-              }
-            }
-
-          case 'plugins':
-            patchPlugins(win)
-            return null
-
-          case 'presentation':
-            return null
-
-          case 'product':
-            return {
-              get product () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'product'
-                )
-              }
-            }
-
-          case 'productSub':
-            return {
-              get productSub () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'productSub'
-                )
-              }
-            }
-
-          case 'serviceWorker':
-            return null
-
-          case 'storage':
-            return null
-
-          case 'usb':
-            return null
-
-          case 'userAgent2':
-            return {
-              get userAgent () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'userAgent'
-                )
-              }
-            }
-
-          case 'vendor':
-            return {
-              get vendor () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'vendor'
-                )
-              }
-            }
-
-          case 'vendorSub':
-            return {
-              get vendor () {
-                return VAL(
-                  base(this, arguments),
-                  'navigator', 'vendorSub'
-                )
-              }
-            }
-
-          case 'webkitPersistentStorage':
-            return null
-
-          case 'webkitTemporaryStorage':
-            return null
-
-          default:
-            return null
-        }
-      })
-    }
-
-    function patchConnection (win: any) {
-      let model = VAL_AT('navigator', 'connection')
-      if (!model) {
-        return
-      }
-
-      let networkInformation = win[ 'NetworkInformation' ]
-      if (!networkInformation) {
-        return
-      }
-
-      let proto = new Prototype(networkInformation.prototype)
-      proto.define((name, base) => {
-        switch (name) {
-          case 'downlink':
-            return {
-              get downlink () {
-                return VAL_FOR(
-                  base(this, arguments),
-                  model,
-                  'downlink'
-                )
-              }
-            }
-
-          case 'effectiveType':
-            return {
-              get effectiveType () {
-                return VAL_FOR(
-                  base(this, arguments),
-                  model,
-                  'effectiveType'
-                )
-              }
-            }
-
-          case 'rtt':
-            return {
-              get rtt () {
-                return VAL_FOR(
-                  base(this, arguments),
-                  model,
-                  'rtt'
-                )
-              }
-            }
-
-          case 'saveData':
-            return {
-              get saveData () {
-                return VAL_FOR(
-                  base(this, arguments),
-                  model,
-                  'saveData'
-                )
-              }
-            }
-        }
-        return null
-      })
-    }
-
-    function patchMediaDevices (win: any) {
-      // Ignore
-    }
-
-    function patchPlugins (win: any) {
-      // Ignore
-    }
-
-    function patchMimeTypes (win: any) {
-      // Ignore
-    }
-
-    /*****************************************************************************/
-    // WebGL
-    /*****************************************************************************/
-
-    const VERT_SRC = '\
+    class Patch {
+      private $function: Prototype
+      private $screen: Prototype
+      private $orientation: Prototype
+      private $navigator: Prototype
+      private $network: Prototype
+      private $webGL: Prototype
+      private $webGL2: Prototype
+      private $canvas: Prototype
+
+      private VERT_SRC = '\
 precision mediump float;\
 attribute float xoffset;\
 uniform float yoffset;\
@@ -939,213 +466,597 @@ void main() {\
   gl_Position = vec4(xoffset, yoffset, 0, 1);\
 }'
 
-    const FRAG_SRC = '\
+      private FRAG_SRC = '\
 precision mediump float;\
 uniform vec3 color;\
 void main() {\
   gl_FragColor = vec4(color,1);\
 }'
 
-    const GL_WATERMARK_LENGTH = 1
+      // private GL_WATERMARK_LENGTH = 1
 
-    function compileShader (gl, type, src) {
-      let shader = gl.createShader(type)
-      gl.shaderSource(shader, src)
-      gl.compileShader(shader)
-      return shader
-    }
-
-    function applyGLWatermark (gl) {
-      let pixels = VAL_AT('pixels')
-      if (!pixels) {
-        return
-      }
-
-      let width = gl.canvas.width
-      let height = gl.canvas.height
-      let wUnit = 2.0 / width
-      let hUnit = 2.0 / height
-
-      function calcPoint (size, placement) {
-        if (placement < 0.0) {
-          placement = 0.0
-        } else if (placement > 1.0) {
-          placement = 1.0
-        }
-        let coord = Math.floor((size - 1) * placement)
-        if (coord < 0) {
-          coord = 0
-        }
-        if (coord >= size) {
-          coord = size - 1
-        }
-        return coord
-      }
-
-      let fragShader = compileShader(gl, gl.FRAGMENT_SHADER, FRAG_SRC)
-      let vertShader = compileShader(gl, gl.VERTEX_SHADER, VERT_SRC)
-
-      let program = gl.createProgram()
-      gl.attachShader(program, fragShader)
-      gl.attachShader(program, vertShader)
-      gl.bindAttribLocation(program, 0, 'xoffset')
-      gl.linkProgram(program)
-
-      gl.useProgram(program)
-
-      let uY = gl.getUniformLocation(program, 'yoffset')
-      let uColor = gl.getUniformLocation(program, 'color')
-
-      let buffer = gl.createBuffer()
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([ -0.5, 0.5 ]), gl.STATIC_DRAW)
-
-      gl.enableVertexAttribArray(0)
-      gl.vertexAttribPointer(0, 1, gl.FLOAT, false, 0, 0)
-
-      function moveX (x, length) {
-        if (x > width) {
-          x = 1.0
-        } else if (x < 0) {
-          x = -1.0
-        } else {
-          x = wUnit * x - 1
-        }
-
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([ x, x + (wUnit * length) ]), gl.STATIC_DRAW)
-      }
-
-      function convertColor (color) {
-        return color * (2.0 / 255.0) - 1.0
-      }
-
-      function calcY (y) {
-        return y * hUnit - 1.0
-      }
-
-      function drawLine (x, y, color) {
-        moveX(x, GL_WATERMARK_LENGTH)
-        y = calcY(y)
-        gl.useProgram(program)
-        gl.uniform1f(uY, y)
-        gl.uniform3fv(uColor, color)
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-        gl.drawArrays(gl.LINES, 0, 2)
-      }
-
-      gl.viewport(0, 0, width, height)
-      gl.lineWidth(1)
-
-      for (let i = 0; i < pixels.length; i++) {
-        let pixel = pixels[ i ]
-
-        drawLine(
-          calcPoint(width, pixel.x),
-          calcPoint(height, pixel.y),
-          [
-            convertColor(pixel.r),
-            convertColor(pixel.g),
-            convertColor(pixel.b)
-          ]
-        )
-      }
-    }
-
-    /**
-     *
-     * @param {Prototype} proto
-     */
-    function patchWebGL (proto: Prototype) {
-      proto.intercept('readPixels', base => {
-        return function readPixels () {
-          applyGLWatermark(this)
-          return base(this, arguments)
-        }
-      })
-
-      proto.intercept('getSupportedExtensions', base => {
-        return function getSupportedExtensions () {
-
-          let value = base(this, arguments)
-          // console.log(value)
-
-          return value
-        }
-      })
-
-      proto.intercept('getParameter', base => {
-        return function getParameter () {
-          switch (arguments[ 0 ]) {
-            case WebGLRenderingContext.VERSION:
-              return 'UT.1.0.3'
+      constructor (win: any) {
+        function of (...path: string[]): Prototype {
+          let o = win
+          for (let i = 0; i < path.length; i++) {
+            o = o[ path[ i ] ]
+            if (!o) {
+              return null
+            }
           }
-
-          let value = base(this, arguments)
-          // console.log(value)
-
-          return value
+          return new Prototype(o)
         }
-      })
-    }
 
-    function patchWebGL2 (proto: Prototype) {
-      proto.intercept('readPixels', base => {
-        return function readPixels (p1, p2, p3, p4, p5, p6, p7) {
-          applyGLWatermark(this)
-          return base(this, arguments)
-        }
-      })
-
-      proto.intercept('getSupportedExtensions', base => {
-        return function getSupportedExtensions () {
-
-          let value = base(this, arguments)
-          // console.log(value)
-
-          return value
-        }
-      })
-
-      proto.intercept('getParameter', base => {
-        return function getParameter () {
-          switch (arguments[ 0 ]) {
-            case WebGLRenderingContext.VERSION:
-              return 'UT.1.0.3'
-          }
-
-          let value = base(this, arguments)
-          // console.log(value)
-
-          return value
-        }
-      })
-    }
-
-    /**
-     *
-     * @param {Prototype} proto
-     */
-    function patchCanvas (proto: Prototype) {
-      let d = GET_OWN_PROPERTY_DESCRIPTOR(proto.proto, 'toDataURL')
-      if (!d) {
-        return
+        this.$function = of('Function', 'prototype')
+        this.$screen = of('Screen', 'prototype')
+        this.$orientation = of('ScreenOrientation', 'prototype')
+        this.$navigator = of('Navigator', 'prototype')
+        this.$network = of('NetworkInformation', 'prototype')
+        this.$canvas = of('HTMLCanvasElement', 'prototype')
+        this.$webGL = of('WebGLRenderingContext', 'prototype')
+        this.$webGL2 = of('WebGL2RenderingContext', 'prototype')
       }
 
-      let b = d.value
-      d.value = function toDataURL () {
-        let canvasWidth = this.width
-        let canvasHeight = this.height
+      apply () {
+        // Patch function.
+        this.func()
+        // Patch Object.
+        // patchObject(new ProtoDef(objectStaticDef), new ProtoDef(objectDef))
+        // Patch screen.
+        this.screen()
+        // Patch navigator.
+        this.navigator()
 
-        if (canvasWidth < 1 || canvasHeight < 1) {
-          return b.apply(this, arguments)
+        if (this.$webGL) {
+          this.webGL()
+        }
+        if (this.$webGL2) {
+          this.webGL2()
+        }
+        if (this.$canvas) {
+          this.canvas()
+        }
+      }
+
+      /**
+       * Function.prototype is leak central! Every single patch is a user defined
+       * function which leaks it's own source code. This exposes the user to the
+       * fact that's it's been tampered with.
+       *
+       * @param {any} win
+       * @param {Prototype} proto
+       */
+      func () {
+        let d = $getOwnPropertyDescriptor(this.$function.proto, 'toString')
+        if (d) {
+          let base = d.value
+          d.value = function toString () {
+            let interceptor = $interceptorMap.get(this)
+            if (interceptor) {
+              return interceptor.toString()
+            }
+
+            return base.apply(this, arguments)
+          }
+          $interceptorMap.set(d.value, base.toString())
+          Object.defineProperty(this.$function.proto, 'toString', d)
+        }
+        d = $getOwnPropertyDescriptor(this.$function.proto, 'toSource')
+        if (d) {
+          let base = d.value
+          d.value = function toSource () {
+            let interceptor = $interceptorMap.get(this)
+            if (interceptor) {
+              return interceptor.toString()
+            }
+
+            return base.apply(this, arguments)
+          }
+          $interceptorMap.set(d.value, base.toString())
+          Object.defineProperty(this.$function.proto, 'toSource', d)
+        }
+      }
+
+      /**
+       *
+       * @param {Prototype} proto
+       */
+      screen () {
+        this.$screen.define((name, base) => {
+          switch (name) {
+            case 'availHeight':
+              return {
+                get availHeight () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'availHeight'
+                  )
+                }
+              }
+
+            case 'availLeft':
+              return {
+                get availLeft () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'availLeft'
+                  )
+                }
+              }
+
+            case 'availTop':
+              return {
+                get availTop () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'availTop'
+                  )
+                }
+              }
+
+            case 'availWidth':
+              return {
+                get availWidth () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'availWidth'
+                  )
+                }
+              }
+
+            case 'colorDepth':
+              return {
+                get colorDepth () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'colorDepth'
+                  )
+                }
+              }
+
+            case 'left':
+              return {
+                get left () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'left'
+                  )
+                }
+              }
+
+            case 'width':
+              return {
+                get width () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'width'
+                  )
+                }
+              }
+
+            case 'height':
+              return {
+                get height () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'height'
+                  )
+                }
+              }
+
+            case 'mozOrientation':
+              return {
+                get mozOrientation () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'mozOrientation'
+                  )
+                }
+              }
+
+            case 'orientation':
+              // Patch ScreenOrientation.prototype
+              this.orientation()
+
+              // Orientation's prototype is intercepted so no need to intercept it's getter.
+              return null
+
+            case 'pixelDepth':
+              return {
+                get pixelDepth () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'pixelDepth'
+                  )
+                }
+              }
+
+            case 'top':
+              return {
+                get top () {
+                  return $val(
+                    base(this, arguments),
+                    'screen', 'top'
+                  )
+                }
+              }
+          }
+          return null
+        })
+      }
+
+      /**
+       *
+       */
+      orientation () {
+        let model = $model('screen', 'orientation')
+        if (!model || !this.$orientation) {
+          return
         }
 
-        let pixels = VAL_AT('pixels')
+        this.$orientation.define((name, base) => {
+          switch (name) {
+            case 'angle':
+              return {
+                get angle () {
+                  return $valFor(
+                    base(this, arguments),
+                    model,
+                    'angle'
+                  )
+                }
+              }
+
+            case 'type':
+              return {
+                get type () {
+                  return $valFor(
+                    base(this, arguments),
+                    model,
+                    'type'
+                  )
+                }
+              }
+          }
+          return null
+        })
+      }
+
+      /**
+       *
+       * @param {Prototype} proto
+       */
+      navigator () {
+        this.$navigator.define((name, base) => {
+          switch (name) {
+            case 'appCodeName':
+              return {
+                get appCodeName () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'appCodeName'
+                  )
+                }
+              }
+
+            case 'appName':
+              return {
+                get appName () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'appName'
+                  )
+                }
+              }
+
+            case 'appVersion':
+              return {
+                get appVersion () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'appVersion'
+                  )
+                }
+              }
+
+            case 'bluetooth':
+              return null
+
+            case 'budget':
+              return null
+
+            case 'network':
+              this.network()
+              return null
+
+            case 'cookieEnabled':
+              return null
+
+            case 'credentials':
+              return null
+
+            case 'deviceMemory':
+              return {
+                get deviceMemory () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'deviceMemory'
+                  )
+                }
+              }
+
+            case 'doNotTrack':
+              return {
+                get doNotTrack () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'doNotTrack'
+                  )
+                }
+              }
+
+            case 'geolocation':
+              return null
+
+            case 'hardwareConcurrency':
+              return {
+                get hardwareConcurrency () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'hardwareConcurrency'
+                  )
+                }
+              }
+
+            case 'language':
+              return {
+                get language () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'language'
+                  )
+                }
+              }
+
+            case 'languages':
+              return {
+                get languages () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'languages'
+                  )
+                }
+              }
+
+            case 'maxTouchPoints':
+              return {
+                get maxTouchPoints () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'maxTouchPoints'
+                  )
+                }
+              }
+
+            case 'mediaDevices':
+              this.mediaDevices()
+              return null
+
+            case 'mimeTypes':
+              this.mimeTypes()
+              return null
+
+            case 'onLine':
+              return {
+                get maxTouchPoints () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'onLine'
+                  )
+                }
+              }
+
+            case 'permissions':
+              return null
+
+            case 'platform':
+              return {
+                get platform () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'platform'
+                  )
+                }
+              }
+
+            case 'plugins':
+              this.plugins()
+              return null
+
+            case 'presentation':
+              return null
+
+            case 'product':
+              return {
+                get product () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'product'
+                  )
+                }
+              }
+
+            case 'productSub':
+              return {
+                get productSub () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'productSub'
+                  )
+                }
+              }
+
+            case 'serviceWorker':
+              return null
+
+            case 'storage':
+              return null
+
+            case 'usb':
+              return null
+
+            case 'userAgent2':
+              return {
+                get userAgent () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'userAgent'
+                  )
+                }
+              }
+
+            case 'vendor':
+              return {
+                get vendor () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'vendor'
+                  )
+                }
+              }
+
+            case 'vendorSub':
+              return {
+                get vendor () {
+                  return $val(
+                    base(this, arguments),
+                    'navigator', 'vendorSub'
+                  )
+                }
+              }
+
+            case 'webkitPersistentStorage':
+              return null
+
+            case 'webkitTemporaryStorage':
+              return null
+
+            default:
+              return null
+          }
+        })
+      }
+
+      /**
+       *
+       */
+      network () {
+        let model = $model('navigator', 'network')
+        if (!model || !this.$network) {
+          return
+        }
+
+        this.$network.define((name, base) => {
+          switch (name) {
+            case 'downlink':
+              return {
+                get downlink () {
+                  return $valFor(
+                    base(this, arguments),
+                    model,
+                    'downlink'
+                  )
+                }
+              }
+
+            case 'effectiveType':
+              return {
+                get effectiveType () {
+                  return $valFor(
+                    base(this, arguments),
+                    model,
+                    'effectiveType'
+                  )
+                }
+              }
+
+            case 'rtt':
+              return {
+                get rtt () {
+                  return $valFor(
+                    base(this, arguments),
+                    model,
+                    'rtt'
+                  )
+                }
+              }
+
+            case 'saveData':
+              return {
+                get saveData () {
+                  return $valFor(
+                    base(this, arguments),
+                    model,
+                    'saveData'
+                  )
+                }
+              }
+          }
+          return null
+        })
+      }
+
+      /**
+       *
+       */
+      mediaDevices () {
+        // TODO:
+      }
+
+      /**
+       *
+       */
+      plugins () {
+        // TODO:
+      }
+
+      /**
+       *
+       */
+      mimeTypes () {
+        // TODO:
+      }
+
+      /**
+       *
+       * @param gl
+       * @param type
+       * @param src
+       * @returns {WebGLShader}
+       */
+      compileShader (gl, type, src) {
+        let shader = gl.createShader(type)
+        gl.shaderSource(shader, src)
+        gl.compileShader(shader)
+        return shader
+      }
+
+      /**
+       *
+       * @param gl
+       */
+      watermark (gl) {
+        let pixels = $model('pixels')
         if (!pixels) {
-          return b.apply(this, arguments)
+          return
         }
 
-        function calculatePlacement (size, placement) {
+        let width = gl.canvas.width
+        let height = gl.canvas.height
+        let wUnit = 2.0 / width
+        let hUnit = 2.0 / height
+
+        function calcPoint (size, placement) {
           if (placement < 0.0) {
             placement = 0.0
           } else if (placement > 1.0) {
@@ -1161,108 +1072,243 @@ void main() {\
           return coord
         }
 
-        let ctx = null
-        try {
-          ctx = this.getContext('2d')
-        } catch (e) {
-          // Ignore
+        let fragShader = this.compileShader(gl, gl.FRAGMENT_SHADER, this.FRAG_SRC)
+        let vertShader = this.compileShader(gl, gl.VERTEX_SHADER, this.VERT_SRC)
+
+        let program = gl.createProgram()
+        gl.attachShader(program, fragShader)
+        gl.attachShader(program, vertShader)
+        gl.bindAttribLocation(program, 0, 'xoffset')
+        gl.linkProgram(program)
+
+        gl.useProgram(program)
+
+        let uY = gl.getUniformLocation(program, 'yoffset')
+        let uColor = gl.getUniformLocation(program, 'color')
+
+        let buffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([ -0.5, 0.5 ]), gl.STATIC_DRAW)
+
+        gl.enableVertexAttribArray(0)
+        gl.vertexAttribPointer(0, 1, gl.FLOAT, false, 0, 0)
+
+        function moveX (x, length) {
+          if (x > width) {
+            x = 1.0
+          } else if (x < 0) {
+            x = -1.0
+          } else {
+            x = wUnit * x - 1
+          }
+
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([ x, x + (wUnit * length) ]), gl.STATIC_DRAW)
         }
 
-        if (ctx && ctx != null) {
-          let writePixel = function (canvasData, _x, _y, _r, _g, _b, _a) {
-            let index = (_x + _y * canvasWidth) * 4
-            canvasData.data[ index ] = _r
-            canvasData.data[ index + 1 ] = _g
-            canvasData.data[ index + 2 ] = _b
-            canvasData.data[ index + 3 ] = _a
-          }
-
-          // Modify ImageData directly.
-          let canvasData = ctx.getImageData(0, 0, canvasWidth, canvasHeight)
-          // Write Pixels.
-          for (let p = 0; p < pixels.length; p++) {
-            let pixl = pixels[ p ]
-            writePixel(
-              canvasData,
-              calculatePlacement(canvasWidth, pixl.x),
-              calculatePlacement(canvasHeight, pixl.y), pixl.r, pixl.g, pixl.b, pixl.a
-            )
-          }
-          // Put image data back.
-          ctx.putImageData(canvasData, 0, 0)
-        } else {
-          try {
-            ctx = this.getContext('webgl2') || this.getContext('webgl') || this.getContext('webgl-experimental')
-          } catch (e) {
-            // Ignore
-          }
-
-          if (ctx) {
-            applyGLWatermark(ctx)
-          }
+        function convertColor (color) {
+          return color * (2.0 / 255.0) - 1.0
         }
 
-        return b.apply(this, arguments)
+        function calcY (y) {
+          return y * hUnit - 1.0
+        }
+
+        function drawLine (x, y, color) {
+          moveX(x, this.GL_WATERMARK_LENGTH)
+          y = calcY(y)
+          gl.useProgram(program)
+          gl.uniform1f(uY, y)
+          gl.uniform3fv(uColor, color)
+          gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+          gl.drawArrays(gl.LINES, 0, 2)
+        }
+
+        gl.viewport(0, 0, width, height)
+        gl.lineWidth(1)
+
+        for (let i = 0; i < pixels.length; i++) {
+          let pixel = pixels[ i ]
+
+          drawLine(
+            calcPoint(width, pixel.x),
+            calcPoint(height, pixel.y),
+            [
+              convertColor(pixel.r),
+              convertColor(pixel.g),
+              convertColor(pixel.b)
+            ]
+          )
+        }
       }
 
-      Object.defineProperty(proto.proto, 'toDataURL', d)
+      /**
+       *
+       * @param {Prototype} proto
+       */
+      webGL () {
+        if (!this.$webGL) {
+          return
+        }
+
+        this.$webGL.intercept('readPixels', base => {
+          return function readPixels () {
+            this.watermark(this)
+            return base(this, arguments)
+          }
+        })
+
+        this.$webGL.intercept('getSupportedExtensions', base => {
+          return function getSupportedExtensions () {
+
+            let value = base(this, arguments)
+            // console.log(value)
+
+            return value
+          }
+        })
+
+        this.$webGL.intercept('getParameter', base => {
+          return function getParameter () {
+            switch (arguments[ 0 ]) {
+              case WebGLRenderingContext.VERSION:
+                return 'UT.1.0.3'
+            }
+
+            let value = base(this, arguments)
+            // console.log(value)
+
+            return value
+          }
+        })
+      }
+
+      /**
+       *
+       */
+      webGL2 () {
+        if (!this.$webGL2) {
+          return
+        }
+
+        this.$webGL2.intercept('readPixels', base => {
+          return function readPixels (p1, p2, p3, p4, p5, p6, p7) {
+            this.watermark(this)
+            return base(this, arguments)
+          }
+        })
+
+        this.$webGL2.intercept('getSupportedExtensions', base => {
+          return function getSupportedExtensions () {
+
+            let value = base(this, arguments)
+            // console.log(value)
+
+            return value
+          }
+        })
+
+        this.$webGL2.intercept('getParameter', base => {
+          return function getParameter () {
+            switch (arguments[ 0 ]) {
+              case WebGLRenderingContext.VERSION:
+                return 'UT.1.0.3'
+            }
+
+            let value = base(this, arguments)
+            // console.log(value)
+
+            return value
+          }
+        })
+      }
+
+      /**
+       *
+       * @param {Prototype} proto
+       */
+      canvas () {
+        // Cache pointer to 'getImageData' to ensure it's not intercepted by a user script
+        let $getImageData = this.$canvas.value('getImageData')
+        let pixels = $model('pixels')
+
+        this.$canvas.intercept('toDataURL', base => {
+          return function toDataURL () {
+            let canvasWidth = this.width
+            let canvasHeight = this.height
+
+            if (canvasWidth < 1 || canvasHeight < 1) {
+              return base(this, arguments)
+            }
+
+            if (!pixels) {
+              return base(this, arguments)
+            }
+
+            function calculatePlacement (size, placement) {
+              if (placement < 0.0) {
+                placement = 0.0
+              } else if (placement > 1.0) {
+                placement = 1.0
+              }
+              let coord = Math.floor((size - 1) * placement)
+              if (coord < 0) {
+                coord = 0
+              }
+              if (coord >= size) {
+                coord = size - 1
+              }
+              return coord
+            }
+
+            let ctx = null
+            try {
+              ctx = this.getContext('2d')
+            } catch (e) {
+              // Ignore
+            }
+
+            if (ctx) {
+              let writePixel = function (canvasData, _x, _y, _r, _g, _b, _a) {
+                let index = (_x + _y * canvasWidth) * 4
+                canvasData.data[ index ] = _r
+                canvasData.data[ index + 1 ] = _g
+                canvasData.data[ index + 2 ] = _b
+                canvasData.data[ index + 3 ] = _a
+              }
+
+              // Modify ImageData directly.
+              let canvasData = $getImageData.apply(ctx, 0, 0, canvasWidth, canvasHeight)
+              // Write Pixels.
+              for (let p = 0; p < pixels.length; p++) {
+                let pixl = pixels[ p ]
+                writePixel(
+                  canvasData,
+                  calculatePlacement(canvasWidth, pixl.x),
+                  calculatePlacement(canvasHeight, pixl.y), pixl.r, pixl.g, pixl.b, pixl.a
+                )
+              }
+              // Put image data back.
+              ctx.putImageData(canvasData, 0, 0)
+            } else {
+              try {
+                ctx = this.getContext('webgl2') || this.getContext('webgl') || this.getContext('webgl-experimental')
+              } catch (e) {
+                // Ignore
+              }
+
+              if (ctx) {
+                this.watermark(ctx)
+              }
+            }
+
+            return base(this, arguments)
+          }
+        })
+      }
     }
 
-    //
-    // function patchSystemColors (protoDef: ProtoDef) {
-    //
-    // }
-    //
-    // function patchWebRTC () {
-    //
-    // }
-
-    /*****************************************************************************/
-    // Apply Patches
-    /*****************************************************************************/
-
-    function patch (win: any) {
-      // ignore
-      let functionStaticDef = win[ 'Function' ]
-      let functionDef = functionStaticDef[ 'prototype' ]
-      // let objectStaticDef = win[ 'Object' ]
-      // let objectDef = objectStaticDef[ 'prototype' ]
-      let screenStaticDef = win[ 'Screen' ]
-      let screenDef = screenStaticDef[ 'prototype' ]
-      let navigatorStaticDef = win[ 'Navigator' ]
-      let navigatorDef = navigatorStaticDef[ 'prototype' ]
-
-      let canvas = win [ 'HTMLCanvasElement' ]
-      let canvasPrototype = canvas ? canvas[ 'prototype' ] : null
-      let webGL = win[ 'WebGLRenderingContext' ]
-      let webGLPrototype = webGL ? webGL[ 'prototype' ] : null
-      let webGL2 = win[ 'WebGL2RenderingContext' ]
-      let webGL2Prototype = webGL2 ? webGL2[ 'prototype' ] : null
-
-      // Patch function.
-      patchFunction(win, new Prototype(functionDef))
-      // Patch Object.
-      // patchObject(new ProtoDef(objectStaticDef), new ProtoDef(objectDef))
-      // Patch screen.
-      patchScreen(win, new Prototype(screenDef))
-      // Patch navigator.
-      patchNavigator(win, new Prototype(navigatorDef))
-      // Patch WebGL
-      if (webGLPrototype) {
-        patchWebGL(new Prototype(webGLPrototype))
-      }
-      if (webGL2Prototype) {
-        patchWebGL2(new Prototype(webGL2Prototype))
-      }
-      // Patch Canvas.
-      if (canvasPrototype) {
-        patchCanvas(new Prototype(canvasPrototype))
-      }
-
-      // TODO: Patch System Colors.
-    }
-
-    patch(window)
+    // Apply patch
+    new Patch(window).apply()
 
     // /************************************************************************/
     // /************************************************************************/
@@ -1629,7 +1675,8 @@ void main() {\
      */
     function patchIFrame (iframe: HTMLIFrameElement) {
       try {
-        patch(iframe.contentWindow)
+        new Patch(iframe.contentWindow).apply()
+        // patch(iframe.contentWindow)
       } catch (e) {
         // Likely a security error which is ok since the content script will get
         // loaded on every frame.
@@ -1696,37 +1743,7 @@ void main() {\
   // Clean up our tracks.
   script.remove()
 
-  // let iframe = window.frameElement
-  // let par = iframe.parentNode
-  // let sandbox = iframe.getAttribute("sandbox")
-  // // Stop iframe from loading.
-  // // window.stop()
-  //
-  // // localStorage.setItem('P', profile)
-  // //
-  // // Save the nextSibling node so the iframe may be inserted back to where it originally was.
-  // let nextSibling = iframe.nextSibling
-  // //
-  // // // Remove from DOM.
-  // par.removeChild(iframe)
-  // //
-  // // // Add "allow-scripts" to sandbox.
-  // // // It's important to inherit the original value so we add it onto the end.
-  // iframe.setAttribute("sandbox", sandbox === '' ? "allow-scripts" : sandbox + " allow-scripts")
-  // // //
-  // // Add back to DOM.
-  // if (nextSibling)
-  //   par.insertBefore(iframe, nextSibling)
-  // else
-  //   par.appendChild(iframe)
-  //
-  // // Revert sandbox back to original value.
-  // // Since it has already been added back onto the DOM, this won't change
-  // // the functionality. It makes it look as though nothing has changed.
-  // iframe.setAttribute("sandbox", sandbox)
-// }
-
-  console.log(`Untraceable Fingerprint Patched in ${window.performance.now() - start} milliseconds`)
+  log(`Untraceable Fingerprint Patched in ${window.performance.now() - start} milliseconds`)
 }
 
 // function generateUUID () {

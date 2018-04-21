@@ -8,8 +8,9 @@
     "module": "commonjs",
     "target": "es6",
     "jsx": "react",
-
+    "jsxFactory": "h",
     "lib": ["es6", "dom"],
+    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": ["node_modules/@types", "node_modules/web-ext-types"]
   },
